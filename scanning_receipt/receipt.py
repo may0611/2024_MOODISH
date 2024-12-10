@@ -17,15 +17,23 @@ def load_ingredients(file_path):
         return [line.strip() for line in f.readlines()]
 
 # 파일에서 식재료 목록을 읽어옴
-ingredients_list = load_ingredients('scanning_receipt/listOfIngredients.txt')
+ingredients_list = load_ingredients('scanning_receipt/finalIngredientsList.txt')
 
 # 한국어 형태소 분석
 okt = Okt()
 words = [word for word, pos in okt.pos(text) if pos == 'Noun']
-
 # 추출된 식재료 필터링
 extracted_ingredients = [word for word in words if word in ingredients_list]
 
-# 추출된 식재료 출력
+# 중복 제거 (순서 유지) 및 불필요한 공백, 특수문자 제거
+unique_ingredients = []
+for ingredient in extracted_ingredients:
+    clean_ingredient = ingredient.strip()  # 공백 제거
+    # 특수문자, 숫자 등 불필요한 단어를 제거 (여기서는 한글과 공백만 허용)
+    if clean_ingredient and clean_ingredient not in unique_ingredients:
+        unique_ingredients.append(clean_ingredient)
+
+
+
 print("추출된 식재료:", extracted_ingredients)
 print(text)
