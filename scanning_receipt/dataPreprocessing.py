@@ -1,32 +1,41 @@
+#재료 리스트 만들기
+
 import pandas as pd
 from konlpy.tag import Okt
 import re
 
 okt = Okt()
 
-# 명사 추출 함수
-def extract_nouns(text):
-    # 제거할 단어 목록 정의
-    remove_words = ['적당', '량', '움큼', '꼬짐', '쪽', '약간', '외', '재료']
+# 재료 처리 함수
+def extract_ingredients(ingredient_str):
+    # 집에 대부분 있을 것 같은 재료 제외
+    common_ingredients = {'소금', '후추', '식용유', '참깨', '물',
+                          '올리브유','간장','설탕','참기름','다진마늘','물엿','고추장','고춧가루'}
     
-    # 숫자, 단위, 불필요한 단어들을 제거하는 정규 표현식
-    text = re.sub(r'[\d\(\)\[\]|\|개장컵TCR]+', '', text)
+    # 대괄호 안의 내용 제거 및 '|'로 분리
+    parts = re.split(r'\[.*?\]|\|', ingredient_str)
+    ingredient_str = re.sub(r'\(.*?\)', '', ingredient_str)  # 소괄호 제거
     
-    # 불필요한 단어 제거
-    for word in remove_words:
-        text = re.sub(r'\b' + re.escape(word) + r'\b', '', text)  # \b는 단어 경계를 의미
+    # 각 부분에서 마지막 단어 제거
+    cleaned_parts = [
+        ' '.join(part.split()[:-1])  # 마지막 단어 제거
+        for part in parts if part.strip()  # 빈 문자열 제거
+    ]
+    # 기본 재료 제거
+    result = [
+        item for item in ' '.join(cleaned_parts).split() 
+        if item not in common_ingredients
+    ]
     
-    # 명사 추출
-    nouns = okt.nouns(text)
-    
-    # 명사만 공백으로 이어서 반환
-    return ' '.join(nouns).strip()  # 앞뒤 공백 제거
+    return '\n'.join(result).strip()
 
 # CSV 파일에서 데이터 읽기
-data = pd.read_csv('recipe_data.csv')
+data = pd.read_csv('scanning_receipt/recipe_data.csv')
 
-# 'ingredient' 컬럼에서 명사 추출
-data['nouns'] = data['ingredient'].apply(extract_nouns)
+# 재료 정리
+data['ingredient'] = data['ingredient'].apply(extract_ingredients)
 
-# 제거 후 명사만 추출된 데이터만 출력
-print(data['nouns'].head())
+# 결과를 txt 파일로 저장
+with open('finalIngredientsList.txt', 'w', encoding='utf-8') as f:
+    for line in data['ingredient']:
+        f.write(line + '\n')
