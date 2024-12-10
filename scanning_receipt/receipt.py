@@ -6,7 +6,7 @@ from konlpy.tag import Okt
 pytesseract.pytesseract.tesseract_cmd = r'/opt/homebrew/bin/tesseract'
 
 # 이미지 로드
-image = Image.open('./image/receipt1.png')
+image = Image.open('scanning_receipt/image/receipt1.png')
 
 # OCR을 사용하여 텍스트 추출
 text = pytesseract.image_to_string(image, lang='kor')
@@ -17,7 +17,7 @@ def load_ingredients(file_path):
         return [line.strip() for line in f.readlines()]
 
 # 파일에서 식재료 목록을 읽어옴
-ingredients_list = load_ingredients('listOfIngredients.txt')
+ingredients_list = load_ingredients('scanning_receipt/listOfIngredients.txt')
 
 # 한국어 형태소 분석
 okt = Okt()

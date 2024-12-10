@@ -23,7 +23,7 @@ def extract_nouns(text):
     return ' '.join(nouns).strip()  # 앞뒤 공백 제거
 
 # CSV 파일에서 데이터 읽기
-data = pd.read_csv('recipe_data.csv')
+data = pd.read_csv('scanning_receipt/recipe_data.csv')
 
 # 'ingredient' 컬럼에서 명사 추출
 data['nouns'] = data['ingredient'].apply(extract_nouns)
