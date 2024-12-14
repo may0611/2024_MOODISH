@@ -5,6 +5,8 @@ from flask_cors import CORS
 from data import Recommend
 from fer import test_fer
 from scanning_receipt import receipt
+from PIL import Image
+import io
 
 
 #cd pra , npm start
@@ -56,14 +58,22 @@ def emtion_data():
 
     return jsonify({'emotion': result2}) # return type에 따라 추후 변경
 
-#영수증 인식
 @app.route('/receipt', methods=['POST'])
 def receipt_data():
-    data = request.get_json()  # 이미지 형태 (json아닐수도 있음)
+    # 클라이언트에서 보낸 영수증 이미지 받기
+    file = request.files['receipt']  # 'receipt'라는 필드에서 파일 받기
+    user_input = request.form['userInput']
+    user_input_time = request.form['userInput_time']
+    user_input_diffi = request.form['userInput_diffi']
+    
+    # 이미지를 Image 객체로 변환 (PIL 사용)
+    image = Image.open(io.BytesIO(file.read()))  # 받은 파일을 BytesIO로 감싸서 Image로 로드
 
-    result = receipt.receipt_function(data)
+    # 이미지 처리 및 영수증 인식 함수 호출
+    result = receipt.receipt_function(image)  # receipt_function에 이미지 전달
 
-    return jsonify({'receipt': result}) # return type에 따라 추후 변경
+    # 결과 반환
+    return jsonify({'receipt': result})
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0',port = 5000)
