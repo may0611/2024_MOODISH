@@ -1,7 +1,7 @@
 from fer import FER
 import cv2
 
-img_path = r"C:\Users\sny79\test_image.jpg"
+img_path = r"FER/test_image.jpg"
 img = cv2.imread(img_path)
 
 if img is None:
