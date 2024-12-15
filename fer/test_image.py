@@ -1,13 +1,17 @@
 from fer import FER
 import cv2
 
-
-
-img_path = r"FER/test_image.jpg"
-
+img_path = r"FER\test_image.jpg"
 img = cv2.imread(img_path)
 
-
+emotion_mapping = {
+    'happy' : 'happy',
+    'sad' : 'sad',
+    'angry' : 'anger/stress',
+    'fear' : 'anger/stress',
+    'neutral' : 'bored',
+    'disgust' : 'fatigue', 
+} #감정 매핑
 
 def Emotion(img):
     if img is None:
