@@ -1,7 +1,11 @@
 from fer import FER
 import cv2
 
+<<<<<<< HEAD
 img_path = r"C:\Users\user\Documents\GitHub\2024_MOODISH\fer\test_image.jpg"
+=======
+img_path = r"FER/test_image.jpg"
+>>>>>>> main
 img = cv2.imread(img_path)
 
 
