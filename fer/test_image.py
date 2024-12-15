@@ -1,15 +1,7 @@
 from fer import FER
 import cv2
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-img_path = r"C:\Users\user\Documents\GitHub\2024_MOODISH\fer\test_image.jpg"
-=======
-img_path = r"FER/test_image.jpg"
->>>>>>> main
-=======
-img_path = r"FER\test_image.jpg"
->>>>>>> developScanning
+img_path = r"FER/test_image.jpg"
 img = cv2.imread(img_path)
 
 emotion_mapping = {
