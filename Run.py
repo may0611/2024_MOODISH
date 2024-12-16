@@ -1,14 +1,15 @@
+import cv2
+from fer import FER
 import numpy as np
 import pandas as pd
+from moodish import receiptForFlask
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from data import Recommend
-from fer import test_fer
+from FER import test_image
 from scanning_receipt import receipt
-from PIL import Image
-import io
 from food_img import info
-
+import traceback
 
 #cd pra , npm start
 
@@ -67,17 +68,6 @@ def recommend_data():
     print("request check")
     return jsonify({'result': joined_string})
 
-
-#사진 이미지 반환
-@app.route('/foodImg', methods=['POST'])
-def receipt_data():
-    data = request.get_json()  #음식 이름
-    foodName_get = data.get('foodName')
-
-    res = info.food_info(foodName_get)
-
-    return jsonify({'img_link': res}) # return type에 따라 추후 변경
-
 #감정 분석
 @app.route('/analyze_emotion', methods=['POST'])
 def analyze_emotion():
@@ -102,12 +92,12 @@ def analyze_emotion():
 
         # 감정 매핑 정의
         emotion_mapping = {
-            'happy': 'happy',
-            'sad': 'sad',
-            'angry': 'anger/stress',
-            'fear': 'anger/stress',
-            'neutral': 'bored',
-            'disgust': 'fatigue'
+            'happy': '행복함',
+            'sad': '슬픔',
+            'angry': '화남/스트레스',
+            'fear': '화남/스트레스',
+            'neutral': '지루함',
+            'disgust': '피곤함'
         }
 
         # 리스트 형태 결과 처리
@@ -135,22 +125,34 @@ def analyze_emotion():
         print("Error occurred:", str(e))
         return jsonify({"error": f"서버 에러: {str(e)}"}), 500
 
-# 영수증 처리 (receiptForFlask.py 활용) API 엔드포인트
+#영수증 인식
 @app.route('/receipt', methods=['POST'])
-def receipt_data():
-    # 클라이언트에서 전송된 영수증 이미지 파일 가져오기
-    file = request.files['image']  # 'image'라는 필드에서 파일 받기
+def upload_receipt():
+    # 요청 로그 출력
+    print("Request received at /receipt")
 
-    # 이미지 데이터를 임시 파일로 저장하지 않고 메모리 내에서 처리
-    image = Image.open(io.BytesIO(file.read()))  # 받은 파일을 BytesIO로 감싸서 Image로 로드
+    # 이미지 파일이 요청에 포함되었는지 확인
+    if 'image' not in request.files:
+        return jsonify({"error": "이미지를 업로드하세요."}), 400
 
-    # receiptForFlask.py의 receipt 함수 호출
-    ingredients_list_path = './scanning_receipt/finalIngredientsList.txt'  # 식재료 리스트 파일 경로
-    extracted_ingredients = process_receipt(image, ingredients_list_path)  # 식재료 추출 함수 호출
+    file = request.files['image']
+    print("Image received:", file.filename)
 
-    # 결과를 JSON 형식으로 반환
-    return jsonify({"ingredients": extracted_ingredients})
+    # 이미지를 바로 추출 함수로 전달
+    result = receiptForFlask.extract_ingredients(file)
+    print("Extracted Ingredients:", result)
 
+    return jsonify({'rec_res': result})
+
+#사진 이미지 반환
+@app.route('/foodImg', methods=['POST'])
+def process_food_image():
+    data = request.get_json()  #음식 이름
+    foodName_get = data.get('foodName')
+
+    res = info.food_info(foodName_get)
+
+    return jsonify({'img_link': res})
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0',port = 5000)
