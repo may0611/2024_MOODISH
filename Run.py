@@ -19,10 +19,11 @@ CORS(app)
 
 #user_input 예시
 user_preferences = {
+    'user_id':'',
     'Ingredient': '',
     'time': '120', #최소 5
     'difficult': '아무나',#초급 중급 고급 아무나
-    'happy' : 1,
+    'happy' : 0,
     'board' : 0,
     'tired' : 0,
     'stress' : 0,
@@ -52,14 +53,29 @@ def Emotion(img):
 @app.route('/recommend', methods=['POST'])
 def recommend_data():
     data = request.get_json()  # 클라이언트에서 보낸 JSON 데이터 받기
-    user_input_ingre = data.get('userInput')  # 사용자가 보낸 입력값 받기
+
+    # 사용자가 보낸 입력값 받기
+    user_input_username = data.get('username')
+    user_input_ingre = data.get('userInput')
     user_input_time = data.get('userInput_time')
     user_input_diffi = data.get('userInput_diffi')
-
     
+    # str로 받아오기
+    user_input_emotion = data.get('userInput_emotion')
+
+    user_preferences['Ingredient'] = user_input_ingre
     user_preferences['Ingredient'] = user_input_ingre
     user_preferences['time'] = user_input_time
     user_preferences['difficult'] = user_input_diffi
+
+    user_preferences['happy'] = 0
+    user_preferences['board'] = 0
+    user_preferences['tired'] = 0
+    user_preferences['stress']= 0
+    user_preferences['sad'] = 0
+
+    user_preferences[user_input_emotion] = 1
+    
 
     result = Recommend.Recommend_Function(user_preferences)
 
@@ -67,6 +83,23 @@ def recommend_data():
     print(joined_string)
     print("request check")
     return jsonify({'result': joined_string})
+
+
+#데베에 데이터 넣기
+@app.route('/insertDB', methods=['POST'])
+def insertDB():
+    data = request.get_json()  # 클라이언트에서 보낸 JSON 데이터 받기
+    user_input_name = data.get('userInputname')
+    user_input_recipe = data.get('userjnputrecipe')
+    user_input_emotion = data.get('userInputemotion')
+    user_input_rating = data.get('userInputrating')
+
+
+    Recommend.UpdateRating(user_input_name,user_input_recipe,user_input_emotion,user_input_rating)
+    return 
+
+
+
 
 #감정 분석
 @app.route('/analyze_emotion', methods=['POST'])
