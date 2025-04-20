@@ -245,6 +245,8 @@ def Recommend_Function(user_preferences):
 
 
                             #SVD
+    #성능 검사 (실제 작동에서는 사용x)
+    #ValidationSVD(recommended_recipes[['id', 'name', 'similarity_score']].head(100),data)
 
     #User_Data from Database
     uri = "mongodb+srv://moodish:U3Z1O83eGzTPQbrb@cluster0.n5s1q.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
@@ -262,9 +264,6 @@ def Recommend_Function(user_preferences):
     selected_recipes = recommended_recipes[['id', 'name', 'similarity_score']].head(100)
     recipe_ids = selected_recipes['id'].values
 
-
-    #성능 검사 (실제 작동에서는 사용x)
-    #ValidationSVD(recommended_recipes[['id', 'name', 'similarity_score']].head(100),data)
 
     """EX
     userListed = [
@@ -362,7 +361,3 @@ def Recommend_Function(user_preferences):
     recommended_recipes = data.sort_values(by='combined_similarity_score', ascending=False)
 
     return recommended_recipes[['id', 'name', 'combined_similarity_score']].head(5)
-
-
-
-
